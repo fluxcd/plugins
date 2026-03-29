@@ -1,0 +1,6 @@
+name: operator
+description: Flux Operator CLI
+homepage: https://fluxoperator.dev/
+source: https://github.com/controlplaneio-fluxcd/flux-operator
+bin: flux-operator
+versions: []
