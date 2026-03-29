@@ -133,7 +133,7 @@ jobs:
           branch="update-${PLUGIN}-${VERSION}"
           git checkout -b "$branch"
           git add plugins/${PLUGIN}.yaml
-          git commit -m "Update ${PLUGIN} plugin to ${VERSION}"
+          git commit -s -m "Update ${PLUGIN} plugin to ${VERSION}"
           git push origin "$branch"
           gh pr create \
             --title "Update ${PLUGIN} plugin to ${VERSION}" \
