@@ -1,3 +1,5 @@
+apiVersion: cli.fluxcd.io/v1beta1
+kind: Plugin
 name: operator
 description: Flux Operator CLI
 homepage: https://fluxoperator.dev/

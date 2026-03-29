@@ -1,5 +1,8 @@
 name: validate-catalog
 on:
+  push:
+    branches:
+      - main
   pull_request:
     paths:
       - 'catalog.yaml'
@@ -18,9 +21,34 @@ jobs:
         run: |
           failed=0
 
+          # Validate catalog apiVersion and kind
+          api=$(yq '.apiVersion' catalog.yaml)
+          kind=$(yq '.kind' catalog.yaml)
+          if [ "$api" != "cli.fluxcd.io/v1beta1" ]; then
+            echo "ERROR: catalog.yaml has invalid apiVersion: $api"
+            failed=1
+          fi
+          if [ "$kind" != "PluginCatalog" ]; then
+            echo "ERROR: catalog.yaml has invalid kind: $kind"
+            failed=1
+          fi
+
           # Every plugin file must have a corresponding catalog entry
           for file in plugins/*.yaml; do
             name=$(basename "$file" .yaml)
+
+            # Validate plugin apiVersion and kind
+            papi=$(yq '.apiVersion' "$file")
+            pkind=$(yq '.kind' "$file")
+            if [ "$papi" != "cli.fluxcd.io/v1beta1" ]; then
+              echo "ERROR: $file has invalid apiVersion: $papi"
+              failed=1
+            fi
+            if [ "$pkind" != "Plugin" ]; then
+              echo "ERROR: $file has invalid kind: $pkind"
+              failed=1
+            fi
+
             entry=$(yq ".plugins[] | select(.name == \"$name\")" catalog.yaml)
             if [ -z "$entry" ]; then
               echo "ERROR: plugin '$name' not found in catalog.yaml"
