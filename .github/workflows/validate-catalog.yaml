@@ -1,0 +1,62 @@
+name: validate-catalog
+on:
+  pull_request:
+    paths:
+      - 'catalog.yaml'
+      - 'plugins/*.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Validate catalog
+        run: |
+          failed=0
+
+          # Every plugin file must have a corresponding catalog entry
+          for file in plugins/*.yaml; do
+            name=$(basename "$file" .yaml)
+            entry=$(yq ".plugins[] | select(.name == \"$name\")" catalog.yaml)
+            if [ -z "$entry" ]; then
+              echo "ERROR: plugin '$name' not found in catalog.yaml"
+              failed=1
+            fi
+          done
+
+          # Every catalog entry must have a corresponding plugin file
+          count=$(yq '.plugins | length' catalog.yaml)
+          for ((i=0; i<count; i++)); do
+            name=$(yq ".plugins[$i].name" catalog.yaml)
+            if [ ! -f "plugins/${name}.yaml" ]; then
+              echo "ERROR: catalog entry '$name' has no matching plugins/${name}.yaml"
+              failed=1
+            fi
+
+            # Required catalog fields
+            for field in description homepage source license; do
+              val=$(yq ".plugins[$i].$field" catalog.yaml)
+              if [ "$val" = "null" ] || [ -z "$val" ]; then
+                echo "ERROR: catalog entry '$name' missing required field '$field'"
+                failed=1
+              fi
+            done
+
+            # Name must not collide with builtins
+            for reserved in bootstrap build check completion create debug delete diff envsubst events export get help install list logs migrate plugin pull push reconcile resume stats suspend tag trace tree uninstall version; do
+              if [ "$name" = "$reserved" ]; then
+                echo "ERROR: catalog entry '$name' collides with built-in command"
+                failed=1
+              fi
+            done
+          done
+
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
+
+          echo "Catalog validation passed"

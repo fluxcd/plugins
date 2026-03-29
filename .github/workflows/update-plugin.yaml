@@ -1,0 +1,140 @@
+name: update-plugin
+on:
+  workflow_call:
+    inputs:
+      plugin:
+        required: true
+        type: string
+        description: 'Plugin name matching the filename in plugins/ (e.g. operator).'
+      repo:
+        required: true
+        type: string
+        description: 'Upstream GitHub repository (e.g. controlplaneio-fluxcd/flux-operator).'
+      bin:
+        required: true
+        type: string
+        description: 'Binary name inside the release archive (e.g. flux-operator).'
+      version:
+        required: false
+        type: string
+        description: 'Specific version to add (without v prefix). Defaults to latest release.'
+    secrets:
+      token:
+        required: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Resolve version
+        id: release
+        env:
+          GH_TOKEN: ${{ secrets.token }}
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            version="${{ inputs.version }}"
+          else
+            version=$(gh api repos/${{ inputs.repo }}/releases/latest --jq '.tag_name | ltrimstr("v")')
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Check if update needed
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.token }}
+        run: |
+          current=$(yq '.versions[0].version' plugins/${{ inputs.plugin }}.yaml)
+          if [ "$current" = "${{ steps.release.outputs.version }}" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Skip if an update PR is already open for this version
+          branch="update-${{ inputs.plugin }}-${{ steps.release.outputs.version }}"
+          if gh pr view "$branch" --json state --jq '.state' 2>/dev/null | grep -q OPEN; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download checksums and update manifest
+        if: steps.check.outputs.skip != 'true'
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+          REPO: ${{ inputs.repo }}
+          BIN: ${{ inputs.bin }}
+        run: |
+          base="https://github.com/${REPO}/releases/download/v${VERSION}"
+          checksums=$(curl -fsSL "${base}/${BIN}_${VERSION}_checksums.txt")
+
+          platforms=""
+          for combo in darwin_amd64:tar.gz darwin_arm64:tar.gz linux_amd64:tar.gz linux_arm64:tar.gz windows_amd64:zip windows_arm64:zip; do
+            osarch="${combo%%:*}"
+            ext="${combo##*:}"
+            os="${osarch%%_*}"
+            arch="${osarch##*_}"
+            file="${BIN}_${VERSION}_${osarch}.${ext}"
+            sha=$(echo "$checksums" | grep "  ${file}$" | awk '{print $1}')
+            if [ -n "$sha" ]; then
+              platforms="${platforms}
+              - os: ${os}
+                arch: ${arch}
+                url: ${base}/${file}
+                checksum: sha256:${sha}"
+            fi
+          done
+
+          if [ -z "$platforms" ]; then
+            echo "Error: no platform checksums found for ${BIN} ${VERSION}"
+            exit 1
+          fi
+
+          yq -i ".versions = [{\"version\": \"${VERSION}\", \"platforms\": []}] + .versions" \
+            plugins/${{ inputs.plugin }}.yaml
+          echo "$platforms" | yq -i '.versions[0].platforms = load("/dev/stdin")' \
+            plugins/${{ inputs.plugin }}.yaml
+
+      - name: Verify checksums
+        if: steps.check.outputs.skip != 'true'
+        env:
+          PLUGIN: ${{ inputs.plugin }}
+        run: |
+          file="plugins/${PLUGIN}.yaml"
+          platform_count=$(yq '.versions[0].platforms | length' "$file")
+
+          for ((i=0; i<platform_count; i++)); do
+            os=$(yq ".versions[0].platforms[$i].os" "$file")
+            arch=$(yq ".versions[0].platforms[$i].arch" "$file")
+            url=$(yq ".versions[0].platforms[$i].url" "$file")
+            expected=$(yq ".versions[0].platforms[$i].checksum" "$file" | cut -d: -f2)
+
+            echo "Verifying $os/$arch..."
+            tmpfile=$(mktemp)
+            curl -fsSL -o "$tmpfile" "$url"
+            actual=$(sha256sum "$tmpfile" | awk '{print $1}')
+            rm -f "$tmpfile"
+
+            if [ "$actual" != "$expected" ]; then
+              echo "ERROR: $os/$arch checksum mismatch (expected: $expected, got: $actual)"
+              exit 1
+            fi
+          done
+
+          echo "All checksums verified"
+
+      - name: Create PR
+        if: steps.check.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.token }}
+          VERSION: ${{ steps.release.outputs.version }}
+          PLUGIN: ${{ inputs.plugin }}
+        run: |
+          git config user.name "fluxcdbot"
+          git config user.email "fluxcdbot@users.noreply.github.com"
+          branch="update-${PLUGIN}-${VERSION}"
+          git checkout -b "$branch"
+          git add plugins/${PLUGIN}.yaml
+          git commit -m "Update ${PLUGIN} plugin to ${VERSION}"
+          git push origin "$branch"
+          gh pr create \
+            --title "Update ${PLUGIN} plugin to ${VERSION}" \
+            --body "Automated update from upstream release v${VERSION}"
