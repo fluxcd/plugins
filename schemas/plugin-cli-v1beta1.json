@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/fluxcd/plugins/main/schemas/plugin-cli-v1beta1.json",
+  "title": "Flux CLI Plugin",
+  "description": "Schema for Flux CLI plugin manifests",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "kind",
+    "name",
+    "description",
+    "homepage",
+    "source",
+    "bin",
+    "versions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "const": "cli.fluxcd.io/v1beta1",
+      "description": "API version for the plugin manifest."
+    },
+    "kind": {
+      "type": "string",
+      "const": "Plugin",
+      "description": "Must be Plugin."
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "minLength": 1,
+      "description": "Plugin name. Must not collide with built-in Flux commands."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Short description of the plugin."
+    },
+    "homepage": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "description": "URL to the plugin's homepage."
+    },
+    "source": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "description": "URL to the plugin's source repository."
+    },
+    "bin": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "minLength": 1,
+      "description": "Binary name inside the release archive."
+    },
+    "versions": {
+      "type": "array",
+      "minItems": 1,
+      "description": "List of available versions, ordered from newest to oldest.",
+      "items": {
+        "type": "object",
+        "required": [
+          "version",
+          "platforms"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-.+)?$",
+            "description": "Semantic version without 'v' prefix (e.g. 0.45.0)."
+          },
+          "platforms": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Platform-specific release artifacts.",
+            "items": {
+              "type": "object",
+              "required": [
+                "os",
+                "arch",
+                "url",
+                "checksum"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "os": {
+                  "type": "string",
+                  "enum": [
+                    "darwin",
+                    "linux",
+                    "windows"
+                  ],
+                  "description": "Operating system."
+                },
+                "arch": {
+                  "type": "string",
+                  "enum": [
+                    "amd64",
+                    "arm64"
+                  ],
+                  "description": "CPU architecture."
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://",
+                  "description": "Download URL for the release archive."
+                },
+                "checksum": {
+                  "type": "string",
+                  "pattern": "^sha256:[a-f0-9]{64}$",
+                  "description": "SHA-256 checksum prefixed with 'sha256:'."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

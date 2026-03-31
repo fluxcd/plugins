@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/fluxcd/plugins/main/schemas/plugincatalog-cli-v1beta1.json",
+  "title": "Flux CLI Plugin Catalog",
+  "description": "Schema for the Flux CLI plugin catalog",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "kind",
+    "plugins"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "const": "cli.fluxcd.io/v1beta1",
+      "description": "API version for the plugin catalog."
+    },
+    "kind": {
+      "type": "string",
+      "const": "PluginCatalog",
+      "description": "Must be PluginCatalog."
+    },
+    "plugins": {
+      "type": "array",
+      "minItems": 1,
+      "description": "List of plugins in the catalog.",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "description",
+          "homepage",
+          "source",
+          "license"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$",
+            "minLength": 1,
+            "description": "Plugin name matching the filename in plugins dir."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Short description of the plugin."
+          },
+          "homepage": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://",
+            "description": "URL to the plugin's homepage."
+          },
+          "source": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://",
+            "description": "URL to the plugin's source repository."
+          },
+          "license": {
+            "type": "string",
+            "minLength": 1,
+            "description": "SPDX license identifier (e.g. Apache-2.0, AGPL-3.0)."
+          }
+        }
+      }
+    }
+  }
+}
