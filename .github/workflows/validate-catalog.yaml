@@ -4,9 +4,8 @@ on:
     branches:
       - main
   pull_request:
-    paths:
-      - 'catalog.yaml'
-      - 'plugins/*.yaml'
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -17,38 +16,22 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Validate catalog
+      - name: Setup Go
+        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: cmd/validate/go.mod
+          cache-dependency-path: cmd/validate/go.sum
+
+      - name: Validate schemas
+        run: make validate
+
+      - name: Validate catalog consistency
         run: |
           failed=0
-
-          # Validate catalog apiVersion and kind
-          api=$(yq '.apiVersion' catalog.yaml)
-          kind=$(yq '.kind' catalog.yaml)
-          if [ "$api" != "cli.fluxcd.io/v1beta1" ]; then
-            echo "ERROR: catalog.yaml has invalid apiVersion: $api"
-            failed=1
-          fi
-          if [ "$kind" != "PluginCatalog" ]; then
-            echo "ERROR: catalog.yaml has invalid kind: $kind"
-            failed=1
-          fi
 
           # Every plugin file must have a corresponding catalog entry
           for file in plugins/*.yaml; do
             name=$(basename "$file" .yaml)
-
-            # Validate plugin apiVersion and kind
-            papi=$(yq '.apiVersion' "$file")
-            pkind=$(yq '.kind' "$file")
-            if [ "$papi" != "cli.fluxcd.io/v1beta1" ]; then
-              echo "ERROR: $file has invalid apiVersion: $papi"
-              failed=1
-            fi
-            if [ "$pkind" != "Plugin" ]; then
-              echo "ERROR: $file has invalid kind: $pkind"
-              failed=1
-            fi
-
             entry=$(yq ".plugins[] | select(.name == \"$name\")" catalog.yaml)
             if [ -z "$entry" ]; then
               echo "ERROR: plugin '$name' not found in catalog.yaml"
@@ -65,15 +48,6 @@ jobs:
               failed=1
             fi
 
-            # Required catalog fields
-            for field in description homepage source license; do
-              val=$(yq ".plugins[$i].$field" catalog.yaml)
-              if [ "$val" = "null" ] || [ -z "$val" ]; then
-                echo "ERROR: catalog entry '$name' missing required field '$field'"
-                failed=1
-              fi
-            done
-
             # Name must not collide with builtins
             for reserved in bootstrap build check completion create debug delete diff envsubst events export get help install list logs migrate plugin pull push reconcile resume stats suspend tag trace tree uninstall version; do
               if [ "$name" = "$reserved" ]; then
@@ -87,4 +61,4 @@ jobs:
             exit 1
           fi
 
-          echo "Catalog validation passed"
+          echo "Catalog consistency check passed"
