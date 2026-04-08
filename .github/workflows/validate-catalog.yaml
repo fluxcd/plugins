@@ -49,7 +49,7 @@ jobs:
             fi
 
             # Name must not collide with builtins
-            for reserved in bootstrap build check completion create debug delete diff envsubst events export get help install list logs migrate plugin pull push reconcile resume stats suspend tag trace tree uninstall version; do
+            for reserved in bootstrap build catalog check completion create debug delete diff envsubst events export get help install list logs migrate plugin pull push reconcile resume stats suspend tag trace tree uninstall version; do
               if [ "$name" = "$reserved" ]; then
                 echo "ERROR: catalog entry '$name' collides with built-in command"
                 failed=1
