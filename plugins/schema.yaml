@@ -1,0 +1,34 @@
+apiVersion: cli.fluxcd.io/v1beta1
+kind: Plugin
+name: schema
+description: Kubernetes schema extraction and manifests validation
+homepage: https://fluxcd.io
+source: https://github.com/fluxcd/flux-schema
+bin: flux-schema
+versions:
+  - version: 0.0.1
+    platforms:
+      - os: darwin
+        arch: amd64
+        url: https://github.com/fluxcd/flux-schema/releases/download/v0.0.1/flux-schema_0.0.1_darwin_amd64.tar.gz
+        checksum: sha256:857bfa0cded24bbd32c98fe156ea7c54159f6792028687f23fe653397b8ac716
+      - os: darwin
+        arch: arm64
+        url: https://github.com/fluxcd/flux-schema/releases/download/v0.0.1/flux-schema_0.0.1_darwin_arm64.tar.gz
+        checksum: sha256:06e0a38db4fa6bc9f705a577c7e58dc020bfe2618e45488599e5ef7bb62e3a8a
+      - os: linux
+        arch: amd64
+        url: https://github.com/fluxcd/flux-schema/releases/download/v0.0.1/flux-schema_0.0.1_linux_amd64.tar.gz
+        checksum: sha256:7a2786ec5d4335c68972bd6b68580db108f4cc29a160367fc5088a1b55ece2fa
+      - os: linux
+        arch: arm64
+        url: https://github.com/fluxcd/flux-schema/releases/download/v0.0.1/flux-schema_0.0.1_linux_arm64.tar.gz
+        checksum: sha256:73677ea9af8a0e4a9d6e82c7fe17872479a29a2fe4b1a1d67277a14db67165ec
+      - os: windows
+        arch: amd64
+        url: https://github.com/fluxcd/flux-schema/releases/download/v0.0.1/flux-schema_0.0.1_windows_amd64.zip
+        checksum: sha256:2177210c65a5a79b4fb1627a7fd9ebf0b054fefcc064bb640928029296cf3769
+      - os: windows
+        arch: arm64
+        url: https://github.com/fluxcd/flux-schema/releases/download/v0.0.1/flux-schema_0.0.1_windows_arm64.zip
+        checksum: sha256:68680757fb5c48e14cfee84b6e7b5a9ed2f1d2ca6ec851ec2edf1e14b569c461
