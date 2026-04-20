@@ -6,3 +6,8 @@ plugins:
     homepage: https://fluxoperator.dev/
     source: https://github.com/controlplaneio-fluxcd/flux-operator
     license: AGPL-3.0
+  - name: schema
+    description: Kubernetes schema extraction and manifests validation
+    homepage: https://fluxcd.io
+    source: https://github.com/fluxcd/flux-schema
+    license: Apache-2.0

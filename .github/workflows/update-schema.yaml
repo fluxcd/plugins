@@ -1,0 +1,25 @@
+name: update-schema
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Specific version to add (without v prefix). Defaults to latest release.'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    uses: ./.github/workflows/update-plugin.yaml
+    with:
+      plugin: schema
+      repo: fluxcd/flux-schema
+      bin: flux-schema
+      version: ${{ inputs.version }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
