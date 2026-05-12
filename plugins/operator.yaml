@@ -6,6 +6,32 @@ homepage: https://fluxoperator.dev/
 source: https://github.com/controlplaneio-fluxcd/flux-operator
 bin: flux-operator
 versions:
+  - version: 0.49.0
+    platforms:
+      - os: darwin
+        arch: amd64
+        url: https://github.com/controlplaneio-fluxcd/flux-operator/releases/download/v0.49.0/flux-operator_0.49.0_darwin_amd64.tar.gz
+        checksum: sha256:462597b025fd014aa408f5f77aa77d59b9dbe231cbaceca3275acab9fe5d8cd8
+      - os: darwin
+        arch: arm64
+        url: https://github.com/controlplaneio-fluxcd/flux-operator/releases/download/v0.49.0/flux-operator_0.49.0_darwin_arm64.tar.gz
+        checksum: sha256:eaac1ac89512f4f032f7fa552ae812cd030819a4ba1f28fe88ece87a351d4a56
+      - os: linux
+        arch: amd64
+        url: https://github.com/controlplaneio-fluxcd/flux-operator/releases/download/v0.49.0/flux-operator_0.49.0_linux_amd64.tar.gz
+        checksum: sha256:cb7d259e556c8f7a4d8d4b3620cc241f8dc828868d36795bcc01b11873a2a2d4
+      - os: linux
+        arch: arm64
+        url: https://github.com/controlplaneio-fluxcd/flux-operator/releases/download/v0.49.0/flux-operator_0.49.0_linux_arm64.tar.gz
+        checksum: sha256:a1d548e8216cab28ccaa13c8be4585b45b65cf5bb6521bc77463b9fe00923a70
+      - os: windows
+        arch: amd64
+        url: https://github.com/controlplaneio-fluxcd/flux-operator/releases/download/v0.49.0/flux-operator_0.49.0_windows_amd64.zip
+        checksum: sha256:3dfa48fab1b2e24c7ba64195a23327c2b4f250ae51a07f7397c073c3480b6a6e
+      - os: windows
+        arch: arm64
+        url: https://github.com/controlplaneio-fluxcd/flux-operator/releases/download/v0.49.0/flux-operator_0.49.0_windows_arm64.zip
+        checksum: sha256:569c5ad8af6b41c4f1302da675f614d26c6da753897ac9c673d614395885b5ee
   - version: 0.48.0
     platforms:
       - os: darwin
