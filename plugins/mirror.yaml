@@ -6,6 +6,32 @@ homepage: https://fluxcd.io
 source: https://github.com/fluxcd/flux-mirror
 bin: flux-mirror
 versions:
+  - version: 0.16.0
+    platforms:
+      - os: darwin
+        arch: amd64
+        url: https://github.com/fluxcd/flux-mirror/releases/download/v0.16.0/flux-mirror_0.16.0_darwin_amd64.tar.gz
+        checksum: sha256:a372f8b1c79d180fbb05e823546cd6587cd4ae60eb94fef8410620e4afb38171
+      - os: darwin
+        arch: arm64
+        url: https://github.com/fluxcd/flux-mirror/releases/download/v0.16.0/flux-mirror_0.16.0_darwin_arm64.tar.gz
+        checksum: sha256:1fd402582df74c2a600c7fc69cd113f1608735c3c39c51136bebde72759673e7
+      - os: linux
+        arch: amd64
+        url: https://github.com/fluxcd/flux-mirror/releases/download/v0.16.0/flux-mirror_0.16.0_linux_amd64.tar.gz
+        checksum: sha256:d2dfb055a3767cf8e93cff6fa52a99385822a38d8693338489bc49bce101897d
+      - os: linux
+        arch: arm64
+        url: https://github.com/fluxcd/flux-mirror/releases/download/v0.16.0/flux-mirror_0.16.0_linux_arm64.tar.gz
+        checksum: sha256:7966c126ab51e97aaa0e466cb1252778bf5f11ec0f4ba6312e165089f6cac674
+      - os: windows
+        arch: amd64
+        url: https://github.com/fluxcd/flux-mirror/releases/download/v0.16.0/flux-mirror_0.16.0_windows_amd64.zip
+        checksum: sha256:6045e146bcb6bb709a3dfe2546739ef77b2d329a9a243a60b186c3c37a9c8eed
+      - os: windows
+        arch: arm64
+        url: https://github.com/fluxcd/flux-mirror/releases/download/v0.16.0/flux-mirror_0.16.0_windows_arm64.zip
+        checksum: sha256:473da9035dd3e4c83d54b2761b8abd3393d8af37e9ed6f635c77551cfa4eae55
   - version: 0.15.0
     platforms:
       - os: darwin
