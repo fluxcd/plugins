@@ -6,6 +6,32 @@ homepage: https://fluxcd.io
 source: https://github.com/fluxcd/flux-schema
 bin: flux-schema
 versions:
+  - version: 0.18.0
+    platforms:
+      - os: darwin
+        arch: amd64
+        url: https://github.com/fluxcd/flux-schema/releases/download/v0.18.0/flux-schema_0.18.0_darwin_amd64.tar.gz
+        checksum: sha256:25773f0221b830936a443b12ab8204b2e6e818836062634de66c2884d9dacf6b
+      - os: darwin
+        arch: arm64
+        url: https://github.com/fluxcd/flux-schema/releases/download/v0.18.0/flux-schema_0.18.0_darwin_arm64.tar.gz
+        checksum: sha256:511a405dcad1d599dc4d89fb8d4fbff9559e4173286d604cedff103fe4605dd4
+      - os: linux
+        arch: amd64
+        url: https://github.com/fluxcd/flux-schema/releases/download/v0.18.0/flux-schema_0.18.0_linux_amd64.tar.gz
+        checksum: sha256:6a5d509ae993ae75ae5a3c3b636ba7c6479d81e517b15c96a83b06ff3c84e6e8
+      - os: linux
+        arch: arm64
+        url: https://github.com/fluxcd/flux-schema/releases/download/v0.18.0/flux-schema_0.18.0_linux_arm64.tar.gz
+        checksum: sha256:eb8993c39b2556a71ed80bc3c2bf771f2d537dec3a8148e518d2e760c94c24f3
+      - os: windows
+        arch: amd64
+        url: https://github.com/fluxcd/flux-schema/releases/download/v0.18.0/flux-schema_0.18.0_windows_amd64.zip
+        checksum: sha256:b7b132b6e24be657d497c310ff4f7ae20f893b77e9a2b84cf5de2ab33770ad68
+      - os: windows
+        arch: arm64
+        url: https://github.com/fluxcd/flux-schema/releases/download/v0.18.0/flux-schema_0.18.0_windows_arm64.zip
+        checksum: sha256:bb5f4f2f8b268deab653f57b89b70256e1f2dcf517194fe2c4f11950c293a152
   - version: 0.17.0
     platforms:
       - os: darwin
